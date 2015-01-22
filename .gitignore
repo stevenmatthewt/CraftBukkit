@@ -2,3 +2,14 @@ apache-maven-3.2.3/*
 BuildData/*
 work/*
 BuildTools.log.txt
+world/*
+world_nether/*
+world_the_end/*
+banned-ips.json
+banned-players.json
+eula.txt
+logs/*
+ops.json
+permissions.yml
+usercache.json
+whitelist.json
