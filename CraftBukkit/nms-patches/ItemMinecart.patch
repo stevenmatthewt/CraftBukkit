@@ -1,0 +1,16 @@
+--- ../work/decompile-8eb82bde//net/minecraft/server/ItemMinecart.java	2014-11-28 17:43:43.237707432 +0000
++++ src/main/java/net/minecraft/server/ItemMinecart.java	2014-11-28 17:38:22.000000000 +0000
+@@ -23,6 +23,13 @@
+                 if (enumtrackposition.c()) {
+                     d0 = 0.5D;
+                 }
++                // CraftBukkit start - Minecarts
++                org.bukkit.event.player.PlayerInteractEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callPlayerInteractEvent(entityhuman, org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK, blockposition, enumdirection, itemstack);
++
++                if (event.isCancelled()) {
++                    return false;
++                }
++                // CraftBukkit end
+ 
+                 EntityMinecartAbstract entityminecartabstract = EntityMinecartAbstract.a(world, (double) blockposition.getX() + 0.5D, (double) blockposition.getY() + 0.0625D + d0, (double) blockposition.getZ() + 0.5D, this.b);
+ 

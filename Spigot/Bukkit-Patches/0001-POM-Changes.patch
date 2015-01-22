@@ -1,0 +1,33 @@
+From e17c2827099e58c8f95512ba2e9c71e594a9929b Mon Sep 17 00:00:00 2001
+From: md_5 <md_5@live.com.au>
+Date: Sun, 2 Jun 2013 10:36:24 +1000
+Subject: [PATCH] POM Changes
+
+
+diff --git a/pom.xml b/pom.xml
+index 4d5a7cf..2122a38 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -9,14 +9,14 @@
+         <version>9</version>
+     </parent>
+ 
+-    <groupId>org.bukkit</groupId>
+-    <artifactId>bukkit</artifactId>
++    <groupId>org.spigotmc</groupId>
++    <artifactId>spigot-api</artifactId>
+     <version>1.8-R0.1-SNAPSHOT</version>
+     <packaging>jar</packaging>
+ 
+-    <name>Bukkit</name>
+-    <url>http://www.bukkit.org/</url>
+-    <description>A plugin API for Minecraft servers.</description>
++    <name>Spigot-API</name>
++    <url>http://www.spigotmc.org/</url>
++    <description>An enhanced plugin API for Minecraft servers.</description>
+ 
+     <properties>
+         <maven.compiler.source>1.6</maven.compiler.source>
+-- 
+2.1.0
+

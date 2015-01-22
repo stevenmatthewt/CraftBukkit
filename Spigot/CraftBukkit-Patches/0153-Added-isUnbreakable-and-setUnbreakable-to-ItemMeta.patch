@@ -1,0 +1,141 @@
+From fe442b774bccc0b933b6caa89b1eda7b5af10480 Mon Sep 17 00:00:00 2001
+From: libraryaddict <redwarfare@live.com>
+Date: Fri, 22 Aug 2014 05:35:16 -0400
+Subject: [PATCH] Added isUnbreakable and setUnbreakable to ItemMeta
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
+index fef0971..b1d26dc 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaItem.java
+@@ -207,6 +207,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
+     static final ItemMetaKey ATTRIBUTES_UUID_HIGH = new ItemMetaKey("UUIDMost");
+     @Specific(Specific.To.NBT)
+     static final ItemMetaKey ATTRIBUTES_UUID_LOW = new ItemMetaKey("UUIDLeast");
++    static final ItemMetaKey UNBREAKABLE = new ItemMetaKey("Unbreakable"); // Spigot
+ 
+     private String displayName;
+     private List<String> lore;
+@@ -237,6 +238,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
+         this.repairCost = meta.repairCost;
+         this.attributes = meta.attributes;
+         this.unhandledTags.putAll(meta.unhandledTags);
++        spigot.setUnbreakable( meta.spigot.isUnbreakable() ); // Spigot
+     }
+ 
+     CraftMetaItem(NBTTagCompound tag) {
+@@ -436,6 +438,12 @@ class CraftMetaItem implements ItemMeta, Repairable {
+                 unhandledTags.put(key, tag.get(key));
+             }
+         }
++        // Spigot start
++        if ( tag.hasKey( UNBREAKABLE.NBT ) )
++        {
++            spigot.setUnbreakable( tag.getBoolean( UNBREAKABLE.NBT ) );
++        }
++        // Spigot end
+     }
+ 
+     static Map<Enchantment, Integer> buildEnchantments(NBTTagCompound tag, ItemMetaKey key) {
+@@ -476,6 +484,13 @@ class CraftMetaItem implements ItemMeta, Repairable {
+         }
+ 
+         attributes = null;
++        // Spigot start
++        Boolean unbreakable = SerializableMeta.getObject( Boolean.class, map, UNBREAKABLE.BUKKIT, true );
++        if ( unbreakable != null )
++        {
++            spigot.setUnbreakable( unbreakable );
++        }
++        // Spigot end
+     }
+ 
+     static Map<Enchantment, Integer> buildEnchantments(Map<String, Object> map, ItemMetaKey key) {
+@@ -507,6 +522,14 @@ class CraftMetaItem implements ItemMeta, Repairable {
+         }
+ 
+         applyEnchantments(enchantments, itemTag, ENCHANTMENTS);
++ 
++        // Spigot start
++        if ( spigot.isUnbreakable() )
++        {
++            itemTag.setBoolean( UNBREAKABLE.NBT, true );
++        }
++        // Spigot end
++
+ 
+         if (hasRepairCost()) {
+             itemTag.setInt(REPAIR.NBT, repairCost);
+@@ -570,7 +593,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
+ 
+     @Overridden
+     boolean isEmpty() {
+-        return !(hasDisplayName() || hasEnchants() || hasLore() || hasAttributes() || hasRepairCost() || !unhandledTags.isEmpty());
++        return !(hasDisplayName() || hasEnchants() || hasLore() || hasAttributes() || hasRepairCost() || !unhandledTags.isEmpty() || spigot.isUnbreakable()); // Spigot
+     }
+ 
+     public String getDisplayName() {
+@@ -695,7 +718,8 @@ class CraftMetaItem implements ItemMeta, Repairable {
+                 && (this.hasLore() ? that.hasLore() && this.lore.equals(that.lore) : !that.hasLore())
+                 && (this.hasAttributes() ? that.hasAttributes() && this.attributes.equals(that.attributes) : !that.hasAttributes())
+                 && (this.hasRepairCost() ? that.hasRepairCost() && this.repairCost == that.repairCost : !that.hasRepairCost())
+-                && (this.unhandledTags.equals(that.unhandledTags));
++                && (this.unhandledTags.equals(that.unhandledTags))
++                && this.spigot.isUnbreakable() == that.spigot.isUnbreakable(); // Spigot
+     }
+ 
+     /**
+@@ -722,6 +746,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
+         hash = 61 * hash + (hasAttributes() ? this.attributes.hashCode() : 0);
+         hash = 61 * hash + (hasRepairCost() ? this.repairCost : 0);
+         hash = 61 * hash + unhandledTags.hashCode();
++        hash = 61 * hash + (spigot.isUnbreakable() ? 1231 : 1237); // Spigot
+         return hash;
+     }
+ 
+@@ -764,6 +789,14 @@ class CraftMetaItem implements ItemMeta, Repairable {
+         if (hasRepairCost()) {
+             builder.put(REPAIR.BUKKIT, repairCost);
+         }
++ 
++        // Spigot start
++        if ( spigot.isUnbreakable() )
++        {
++            builder.put( UNBREAKABLE.BUKKIT, true );
++        }
++        // Spigot end
++
+ 
+         return builder;
+     }
+@@ -828,6 +861,7 @@ class CraftMetaItem implements ItemMeta, Repairable {
+         synchronized (HANDLED_TAGS) {
+             if (HANDLED_TAGS.isEmpty()) {
+                 HANDLED_TAGS.addAll(Arrays.asList(
++                    UNBREAKABLE.NBT, // Spigot
+                     DISPLAY.NBT,
+                     REPAIR.NBT,
+                     ATTRIBUTES.NBT,
+@@ -853,6 +887,19 @@ class CraftMetaItem implements ItemMeta, Repairable {
+     // Spigot start
+     private final Spigot spigot = new Spigot()
+     {
++        private boolean unbreakable;
++
++        @Override
++        public void setUnbreakable(boolean setUnbreakable)
++        {
++            unbreakable = setUnbreakable;
++        }
++
++        @Override
++        public boolean isUnbreakable()
++        {
++            return unbreakable;
++        }
+     };
+ 
+     @Override
+-- 
+1.9.5.msysgit.0
+

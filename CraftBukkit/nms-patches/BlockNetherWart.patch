@@ -1,0 +1,12 @@
+--- ../work/decompile-8eb82bde//net/minecraft/server/BlockNetherWart.java	2014-11-28 17:43:42.929707439 +0000
++++ src/main/java/net/minecraft/server/BlockNetherWart.java	2014-11-28 17:38:18.000000000 +0000
+@@ -28,7 +28,8 @@
+ 
+         if (i < 3 && random.nextInt(10) == 0) {
+             iblockdata = iblockdata.set(BlockNetherWart.AGE, Integer.valueOf(i + 1));
+-            world.setTypeAndData(blockposition, iblockdata, 2);
++            // world.setTypeAndData(blockposition, iblockdata, 2); // CraftBukkit
++            org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(world, blockposition.getX(), blockposition.getY(), blockposition.getZ(), this, toLegacyData(iblockdata)); // CraftBukkit
+         }
+ 
+         super.b(world, blockposition, iblockdata, random);

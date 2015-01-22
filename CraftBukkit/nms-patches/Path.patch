@@ -1,0 +1,11 @@
+--- ../work/decompile-8eb82bde//net/minecraft/server/Path.java	2014-11-28 17:43:43.317707430 +0000
++++ src/main/java/net/minecraft/server/Path.java	2014-11-28 17:38:20.000000000 +0000
+@@ -2,7 +2,7 @@
+ 
+ public class Path {
+ 
+-    private PathPoint[] a = new PathPoint[1024];
++    private PathPoint[] a = new PathPoint[128]; // CraftBukkit - reduce default size
+     private int b;
+ 
+     public Path() {}

@@ -1,0 +1,103 @@
+--- ../work/decompile-8eb82bde//net/minecraft/server/TileEntityBeacon.java	2014-12-27 14:58:26.269254675 +0000
++++ src/main/java/net/minecraft/server/TileEntityBeacon.java	2014-12-27 14:58:26.269254675 +0000
+@@ -5,6 +5,11 @@
+ import java.util.Iterator;
+ import java.util.List;
+ 
++// CraftBukkit start
++import org.bukkit.craftbukkit.entity.CraftHumanEntity;
++import org.bukkit.entity.HumanEntity;
++// CraftBukkit end
++
+ public class TileEntityBeacon extends TileEntityContainer implements IUpdatePlayerListBox, IInventory {
+ 
+     public static final MobEffectList[][] a = new MobEffectList[][] { { MobEffectList.FASTER_MOVEMENT, MobEffectList.FASTER_DIG}, { MobEffectList.RESISTANCE, MobEffectList.JUMP}, { MobEffectList.INCREASE_DAMAGE}, { MobEffectList.REGENERATION}};
+@@ -15,6 +20,30 @@
+     private int l;
+     private ItemStack inventorySlot;
+     private String n;
++    // CraftBukkit start - add fields and methods
++    public List<HumanEntity> transaction = new java.util.ArrayList<HumanEntity>();
++    private int maxStack = MAX_STACK;
++
++    public ItemStack[] getContents() {
++        return new ItemStack[] { this.inventorySlot };
++    }
++
++    public void onOpen(CraftHumanEntity who) {
++        transaction.add(who);
++    }
++
++    public void onClose(CraftHumanEntity who) {
++        transaction.remove(who);
++    }
++
++    public List<HumanEntity> getViewers() {
++        return transaction;
++    }
++
++    public void setMaxStackSize(int size) {
++        maxStack = size;
++    }
++    // CraftBukkit end
+ 
+     public TileEntityBeacon() {}
+ 
+@@ -169,8 +198,8 @@
+ 
+     public void a(NBTTagCompound nbttagcompound) {
+         super.a(nbttagcompound);
+-        this.k = nbttagcompound.getInt("Primary");
+-        this.l = nbttagcompound.getInt("Secondary");
++        this.k = validateEffect(nbttagcompound.getInt("Primary")); // CraftBukkit
++        this.l = validateEffect(nbttagcompound.getInt("Secondary")); // CraftBukkit
+         this.j = nbttagcompound.getInt("Levels");
+     }
+ 
+@@ -182,7 +211,7 @@
+     }
+ 
+     public int getSize() {
+-        return 1;
++        return maxStack; // CraftBukkit
+     }
+ 
+     public ItemStack getItem(int i) {
+@@ -282,11 +311,11 @@
+             break;
+ 
+         case 1:
+-            this.k = j;
++            this.k = validateEffect(j); // CraftBukkit
+             break;
+ 
+         case 2:
+-            this.l = j;
++            this.l = validateEffect(j); // CraftBukkit
+         }
+ 
+     }
+@@ -307,4 +336,23 @@
+             return super.c(i, j);
+         }
+     }
++
++    // CraftBukkit start
++    public int validateEffect(int i) {
++        i = i < 0 || i >= MobEffectList.byId.length || MobEffectList.byId[i] == null ? 0 : i;
++        switch (i) {
++            case 1: // MobEffectList.FASTER_MOVEMENT.id
++            case 3: // MobEffectList.FASTER_DIG.id
++            case 11: // MobEffectList.RESISTANCE.id
++            case 8: // MobEffectList.JUMP.id
++            case 5: // MobEffectList.INCREASE_DAMAGE.id
++            case 10: // MobEffectList.REGENERATION.id
++                break;
++            default:                
++                i = 0;
++                break;
++        }
++        return i;
++    }
++    // CraftBukkit end
+ }

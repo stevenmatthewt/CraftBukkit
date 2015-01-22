@@ -1,0 +1,10 @@
+--- ../work/decompile-8eb82bde//net/minecraft/server/EntityPainting.java	2014-11-28 17:43:43.141707434 +0000
++++ src/main/java/net/minecraft/server/EntityPainting.java	2014-11-28 17:38:18.000000000 +0000
+@@ -9,6 +9,7 @@
+ 
+     public EntityPainting(World world) {
+         super(world);
++        this.art = EnumArt.values()[this.random.nextInt(EnumArt.values().length)]; // CraftBukkit - generate a non-null painting
+     }
+ 
+     public EntityPainting(World world, BlockPosition blockposition, EnumDirection enumdirection) {
